@@ -3,6 +3,7 @@ const https = require("https");
 const router = express.Router();
 const User = require("../models/users");
 const Weather = require("../models/weather");
+require('dotenv').config();
 
 router.get("/", (req, res) => {
     res.render("homePage", { error: "" });
@@ -23,9 +24,8 @@ router.get("/users", (req, res) => {
 router.post('/getWeatherData', (req, res) => {
     try {
         let city = req.body.city;
-        let apiKey = "c47da161487447fc815193920242201";
-        const url = `https://api.weatherapi.com/v1/forecast.json?key=${apiKey}&q=${city}&days=1&aqi=no&alerts=no`;
-
+        const url = process.env.WEATHERAPI_URL + `&q=${city}`;
+        
         https.get(url, (response) => {
           let dataString = '';
     
@@ -45,8 +45,7 @@ router.post('/getWeatherData', (req, res) => {
 router.post('/get7days', (req, res) => {
   try {
     let city = req.body.city;
-    let apiKey = "65390bb99a284ae99f6db7af1d9ffaee#";
-    const url = `https://api.weatherbit.io/v2.0/forecast/daily?city=${city}&days=7&key=${apiKey}`;
+    const url = process.env.WEATHERBIT_URL + `&city=${city}`;
 
     https.get(url, (response) => {
       let dataString = '';
@@ -178,8 +177,8 @@ router.post("/editUser", async (req, res) => {
 router.post('/getbackgrounPhoto', (req, res) => {
   try {
     let city = req.body.city;
-    let apiKey = "33700213-37f1f899ac1d43b66c3693ebe";
-    const url = `https://pixabay.com/api/?key=${apiKey}&q=${city}+cityscape+building&image_type=photo&orientation=horizontal&category=buildings&min_width=1400`;
+
+    const url = process.env.PIXABAY_URL + `&q=${city}+cityscape+building`;
 
     https.get(url, (response) => {
       let dataString = '';

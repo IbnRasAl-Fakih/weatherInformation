@@ -1,5 +1,4 @@
 body {
-    top: 0 !important;
     margin: 0;
     padding: 0;
     font-family: 'Jost', sans-serif;
@@ -197,26 +196,4 @@ footer {
     fill: rgba(0,112,210,1);
     stroke-width: 2;
     stroke: white;
-}
-
-#google_translate_element {
-    display: inline;
-}
-
-.goog-te-combo {
-    border-radius: 5px;
-    padding: 5px;
-    font-size: 14px;
-}
-
-.goog-te-combo-list {
-    font-size: 14px;
-}
-
-.goog-te-banner-frame.skiptranslate {
-    display: none;
-}
-
-.goog-te-menu-value {
-    padding: 5px;
 }
