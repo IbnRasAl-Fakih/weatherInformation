@@ -12,8 +12,8 @@
   "dependencies": {
     "@googlemaps/google-maps-services-js": "^3.3.42",
     "body-parser": "^1.20.2",
+    "dotenv": "^16.4.2",
     "ejs": "^3.1.9",
-    "googleapis": "^133.0.0",
     "mongoose": "^8.1.1",
     "nodemon": "^3.0.3"
   }

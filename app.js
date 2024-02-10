@@ -1,15 +1,15 @@
 const express = require("express");
 const mongoose = require("mongoose");
+require('dotenv').config();
 const app = express();
 const POST = 3000;
-const dbURL = "mongodb+srv://boiiian:ReYNLTEMgzwLJFxX@cluster0.vf03xwt.mongodb.net/?retryWrites=true&w=majority";
 
 app.use(express.urlencoded({extended: false}));
 app.use(express.json());
 app.use(express.static("public"));
 app.set("view engine", "ejs");
 
-mongoose.connect(dbURL).then( () => {
+mongoose.connect(process.env.MONGO_URL).then( () => {
     console.log("Connected to db");
 }).catch( (error) => {
     console.log("Error: ", error);
