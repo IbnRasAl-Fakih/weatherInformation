@@ -1,70 +1,46 @@
+let toHistory = false;
+let mapInitialized = false;
+let map;
+
 window.onload = function() {
     document.getElementById("city").value = "Astana";
     document.getElementById("searchButton").click();
 }
 
-let mapInitialized = false;
-let map;
+function getDayOfWeek(dateString) {
+    const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+    const dateObject = new Date(dateString);
+    const dayOfWeekNumber = dateObject.getDay();
+    const dayOfWeek = daysOfWeek[dayOfWeekNumber];
+    return dayOfWeek;
+}
 
 function getMap(lat, lon) {
-    L.mapquest.key = 'NmIjMCcloJXUcQYEqBHiHEyT9sUyRBkC';
+    const center = { lat: lat, lng: lon };
 
-    if (!mapInitialized) {
-        map = L.mapquest.map('map', {
-            center: [lat, lon],
-            layers: L.mapquest.tileLayer('map'),
-            zoom: 12
-        });
+    map = new google.maps.Map(document.getElementById('map'), {
+      center: center,
+      zoom: 12,
+      mapTypeId: 'satellite',
+    });
 
-        map.addControl(L.mapquest.control());
-        mapInitialized = true;
-    } else {
-        map.setView([lat, lon], 12);
-    }
+    marker = new google.maps.Marker({
+      position: center,
+      map: map,
+      draggable: true,
+    });
 }
 
 async function search() {
     let city = document.getElementById("city").value;
     document.getElementById("city").value = "";
-    get14days(city);
-
-    try {
-        const response = await fetch('/search', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-            },
-            body: JSON.stringify({city: city}),
-        });
-        const responseData = await response.json();
-
-        document.getElementById("cityName").innerHTML = responseData.city;
-        document.getElementById("info").innerHTML = `
-            <div>
-                <div class="d-flex justify-content-center" id="icon">
-                    <img src="${responseData.imageURL}" alt="" class="icon">
-                </div>
-                <p class="fs-1 text-capitalize text-center">${responseData.temp} °C</p>
-                <p class="fs-3 text-capitalize text-center" id="text">${responseData.description}</p>
-            </div>
-            <div class="ms-3 fs-6 fw-light">
-                <p class="my-2">Feels like: ${responseData.feelsLike}°C</p>
-                <p class="my-2">Humidity: ${responseData.humidity}%</p>
-                <p class="my-2">Pressure: ${responseData.pressure}mbar</p>
-                <p class="my-2">Wind speed: ${responseData.windSpeed}m/sec</p>
-            </div>
-            <div id="sun"></div>
-            `;
-        getMap(responseData.lat, responseData.lon);
-
-    } catch (error) {
-        console.error('Error: ', error);
-    }
+    getWeatherData(city);
+    get7days(city);
 }
 
-async function get14days(city) {
+async function getWeatherData(city) {
     try {
-        const response = await fetch('/get14days', {
+        const response = await fetch('/getWeatherData', {
             method: 'POST',
             headers: {
                 'Content-Type': 'application/json',
@@ -74,34 +50,48 @@ async function get14days(city) {
         const responseData = await response.json();
 
         let data = responseData.forecast.forecastday;
-        buildHours(data[0]);
-        result = ``;
+        getbackgrounPhoto(city);
+        buildInfo(responseData, city);
+        getMap(responseData.location.lat, responseData.location.lon);
+        buildGraph(data[0].hour);
+        updateHistory(city);
+    } catch (error) {
+        console.error('Error: ', error);
+    }
+}
 
-        for (let day in data) {
-            if (day % 2 == 1) continue;
+async function get7days(city) {
+    try {
+        const response = await fetch('/get7days', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({city: city}),
+        });
+        const responseData = await response.json();
+        result = ``;
+        for (let i in responseData.data) {
             result += `
-                <tr>
-                    <td style="width: 10vw">
-                        <div>
-                            <div class="d-flex justify-content-center">
-                                <img src="${data[day].day.condition.icon}">
-                            </div>
-                            <p class="text-center">${data[day].day.condition.text}</p>
-                            <p class="text-center">${data[day].day.avgtemp_c}°C</p>
-                            <p class="text-center">${data[day].date}</p>
+                <div class="weekBlock mx-2">
+                    <div class="w-100 d-flex justify-content-center my-3">
+                        <img src="https://cdn.weatherbit.io/static/img/icons/${responseData.data[i].weather.icon}.png" class="weekWeather text-center">
+                    </div>
+                    <h4 class="text-center">${responseData.data[i].temp} °C</h4>
+                    <p class="text-center fs-5">${responseData.data[i].weather.description}</p>
+                    <hr class="mx-2">
+                    <div class="mx-3 d-flex justify-content-between">
+                        <div class="d-flex fw-light align-items-center">
+                            <i class="fa-solid fa-wind fa-lg week_icon"></i>
+                            <p class="weekDes ms-1">${responseData.data[i].wind_spd}m/s</p>
                         </div>
-                    </td>
-                    <td style="width: 10vw">
-                        <div>
-                            <div class="d-flex justify-content-center">
-                                <img src="${data[Number(day) + 1].day.condition.icon}">
-                            </div>
-                            <p class="text-center">${data[Number(day) + 1].day.condition.text}</p>
-                            <p class="text-center">${data[Number(day) + 1].day.avgtemp_c}°C</p>
-                            <p class="text-center">${data[Number(day) + 1].date}</p>
+                        <div class="d-flex fw-light align-items-center">
+                            <i class="fa-solid fa-gauge fa-lg week_icon"></i>
+                            <p class="weekDes ms-1">${responseData.data[i].pres}mb</p>
                         </div>
-                    </td>
-                </tr>
+                    </div>
+                    <p class="text-center fs-5 my-3">${getDayOfWeek(responseData.data[i].datetime)}</p>
+                </div>
             `;
         }
 
@@ -111,46 +101,93 @@ async function get14days(city) {
     }
 }
 
-function buildHours(data) {
-    console.log(data)
-    document.getElementById("icon").innerHTML = `<img src="${data.day.condition.icon}" alt="" class="icon">`;
-    document.getElementById("text").innerHTML = data.day.condition.text;
-    document.getElementById("sun").innerHTML = `
-    <p class="fw-light my-2 ms-3">Sunrise: ${data.astro.sunrise}</p>
-    <p class="fw-light my-2 ms-3">Sunset: ${data.astro.sunset}</p>`;
+function buildInfo(data, city) {
+    document.getElementById("cityName").innerHTML = city;
+    document.getElementById("weatherIcon").src = data.current.condition.icon;
+    document.getElementById("temperature").innerHTML = `${data.current.temp_c} °C`;
+    document.getElementById("text").innerHTML = data.current.condition.text;
+    document.getElementById("sunrise").innerHTML = data.forecast.forecastday[0].astro.sunrise;
+    document.getElementById("sunset").innerHTML = data.forecast.forecastday[0].astro.sunset;
+    document.getElementById("humidity").innerHTML = `${data.current.humidity}%`;
+    document.getElementById("windSpeed").innerHTML = `${data.current.wind_kph}km/h`;
+    document.getElementById("visibility").innerHTML = `${data.current.vis_km}km`;
+    document.getElementById("pressure").innerHTML = `${data.current.pressure_mb}mb`;
+}
 
-
-    result = ``;
-    for (let hour in data.hour) {
-        if (hour % 2 == 1) continue;
-        result += `
-            <tr>
-                <td class="d-flex align-items-center">
-                    <div>
-                        <p>${data.hour[hour].time.slice(-5)}</p>
-                    </div>
-                    <div class="mx-3">
-                        <div class="d-flex justify-content-center">
-                            <img src="${data.hour[hour].condition.icon}">
-                        </div>
-                        <p class="text-center">${data.hour[hour].condition.text}</p>
-                    </div>
-                    <div class="mx-3">
-                        <p>Temperature: ${data.hour[hour].temp_c}°C</p>
-                        <p>Feels like: ${data.hour[hour].feelslike_c}°C</p>
-                    </div>
-                    <div class="mx-3">
-                        <p>Pressure: ${data.hour[hour].pressure_mb}mbar</p>
-                        <p>Humidity: ${data.hour[hour].humidity}%</p>
-                    </div>
-                    <div class="mx-3">
-                        <p>Cloud: ${data.hour[hour].cloud}%</p>
-                        <p>Wind: ${data.hour[hour].wind_kph}km/hour</p>
-                    </div>
-                </td>
-            </tr>
-        `;
+async function updateHistory(city) {
+    try {
+        if (toHistory == true) {
+            const currentDate = new Date();
+            const date = `${currentDate.getFullYear()}.${currentDate.getMonth()}.${currentDate.getDate()}`;
+            const time = `${currentDate.getHours()}:${currentDate.getMinutes()}`;
+            const temperature = document.getElementById("temperature").innerHTML;
+            const description = document.getElementById("text").innerHTML;
+            const humidity = document.getElementById("humidity").innerHTML;
+            const pressure = document.getElementById("pressure").innerHTML;
+            const visibility = document.getElementById("visibility").innerHTML;
+            const windSpeed = document.getElementById("windSpeed").innerHTML;
+            const sunrise = document.getElementById("sunrise").innerHTML;
+            const sunset = document.getElementById("sunset").innerHTML;
+            const urlParams = new URLSearchParams(window.location.search);
+            const user = urlParams.get('username');
+            const response = await fetch('/updateHistory', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                body: JSON.stringify({date: date, time: time, city: city, temperature: temperature, description: description, humidity: humidity, pressure: pressure, visibility: visibility, windSpeed: windSpeed, sunrise: sunrise, sunset: sunset, user: user}),
+            });
+        } else {
+            toHistory = true;
+        }
+    } catch (error) {
+        console.error('Error: ', error);
     }
-    document.getElementById("hour").innerHTML = result;
+}
+
+function buildGraph(data) {
+    humidity = [];
+    for (let i in data) {
+        if (i % 2 != 0) continue;
+        humidity.push(data[i].humidity);
+    }
+    let xPoints = ``;
+    result = ``;
+    let k = 150;
+    for (let i in humidity) {
+        let j = 350 - humidity[i] * 3.33;
+        xPoints += `${k},${j}\n`;
+        result += `<circle class="quiz-graph-dot" cx="${k}" cy="${j}" r="6"></circle>`
+        k += 100;
+    }
+
+    let yPoints = `
+        150,350
+        ${xPoints}
+        1250,350`;
+    document.getElementById("yLabels").setAttribute('points', yPoints);
+    document.getElementById("xLabels").setAttribute('points', xPoints);
+    document.getElementById("circles").innerHTML = result;
+}
+
+async function getbackgrounPhoto(city) {
+    try {
+        if (city.toLowerCase() == "astana") return;
+        const response = await fetch('/getbackgrounPhoto', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({city: city}),
+        });
+        const responseData = await response.json();
+        if (responseData.total != 0) {
+            document.getElementById("backgroundPhoto").src = responseData.hits[0].largeImageURL;
+        } else {
+            document.getElementById("backgroundPhoto").src = "https://images.wallpaperscraft.ru/image/single/gorod_kazahstan_doma_59084_2560x1600.jpg";
+        }
+    } catch (error) {
+        console.error('Error: ', error);
+    }
 }
 

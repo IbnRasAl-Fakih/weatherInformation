@@ -1,40 +1,64 @@
 body {
+    top: 0 !important;
     margin: 0;
     padding: 0;
-    background-color: #EAE7DC;
+    font-family: 'Jost', sans-serif;
+    background: linear-gradient(to bottom, #0f0c29, #302b63, #24243e);
 }
 
-input,
-button {
+input{
     padding: 5px 15px;
     font-size: 18px;
     background-color: inherit;
-    border: 2px solid #D8C3A5;
+    border: 2px solid #FFF;
     color: #000;
+    background-color: #FFF;
+}
+
+button{
+    padding: 5px 15px;
+    font-size: 18px;
+    color: #fff;
+    background: #573b8a;
+    font-weight: bold;
+    outline: none;
+    border: none;
+    border-radius: 5px;
+    transition: .2s ease-in;
+    cursor: pointer;
+}
+
+button:hover{
+    background: #6d44b8;
 }
 
 input:focus {
     outline: none;
 }
 
-#cityName {
-    color: #E85A4F;
+.cityName {
+    letter-spacing: 2px;
+}
+
+#city {
+    border-radius: 5px;
+}
+
+#title {
+    color: #fff;
     letter-spacing: 10px;
     text-transform: uppercase;
 }
 
 #info {
-    border: 2px solid #D8C3A5;
+    box-shadow: 5px 20px 50px #000;
+    border-radius: 10px;
     padding: 5px;
 }
 
 .icon {
-    width: 150px;
-    height: 150px;
-}
-
-#map {
-    border: 2px solid #D8C3A5;
+    width: 100px;
+    height: 100px;
 }
 
 p {
@@ -47,9 +71,152 @@ table {
 
 th, td {
     border: 2px solid #D8C3A5;
-}
-
-th, td {
+    background-color: #FFF;
     padding: 5px;
     text-align: center;
+}
+
+.info_block {
+    background-color: #FFF;
+}
+
+.week_icon {
+    color: #696969;
+}
+
+.weekWeather {
+    width: 70px;
+    height: 70px;
+}
+
+.weekBlock {
+    background-color: #FFF;
+    border-radius: 10px;
+    width: 170px;
+}
+
+.weekDes {
+    font-size: 10px;
+}
+
+#week {
+    margin-bottom: 8rem;
+}
+
+.icons {
+    width: 50px;
+    height: 50px;
+    color: #FFD43B;
+}
+
+.icon_title {
+    font-size: 18px;
+}
+
+.icon_value {
+    color: #696969;
+    font-size: 14px;
+}
+
+header {
+    box-shadow: 5px 20px 40px #000;
+}
+
+#main {
+    height: 800px;
+}
+
+#main img {
+    opacity: 60%;
+    filter: brightness(0.6);
+}
+
+#mainContainer {
+    position: absolute;
+    right: 0;
+    top: 0;
+    height: 100%;
+    display: flex;
+    align-items: center;
+}
+
+#map {
+    width: 70%;
+    height: 35rem;
+    margin: 30px 0 8rem;
+    box-shadow: 5px 20px 50px #000;
+}
+
+footer {
+    box-shadow: 20px 5px 50px #000;
+    padding: 5px;
+}
+
+.quiz-chartTip {
+    padding: 5px 10px;
+    border: 1px solid rgba(0,0,0,.1);
+    border-radius: 4px;
+    background-color: rgba(255,255,255,.9);
+    box-shadow: 3px 3px 10px rgba(0,0,0,.1);
+    position: absolute;
+    z-index: 50;
+    max-width: 250px;
+}
+
+.quiz-graph { 
+    height: 400px;
+    width: 88.9%;
+}
+
+.quiz-graph .x-labels {
+    text-anchor: middle;
+}
+
+#hours text{
+    color: #fff;
+}
+
+.quiz-graph .y-labels {
+    text-anchor: end;
+}
+
+.quiz-graph .quiz-graph-grid {
+    stroke: #ccc;
+    stroke-dasharray: 0;
+    stroke-width: 1;
+}
+
+.label-title {
+    text-anchor: middle;
+    text-transform: uppercase;
+    font-size: 14px;
+    fill: white;
+}
+
+.quiz-graph-dot, .quiz-graph-start-dot{
+    fill: rgba(0,112,210,1);
+    stroke-width: 2;
+    stroke: white;
+}
+
+#google_translate_element {
+    display: inline;
+}
+
+.goog-te-combo {
+    border-radius: 5px;
+    padding: 5px;
+    font-size: 14px;
+}
+
+.goog-te-combo-list {
+    font-size: 14px;
+}
+
+.goog-te-banner-frame.skiptranslate {
+    display: none;
+}
+
+.goog-te-menu-value {
+    padding: 5px;
 }
