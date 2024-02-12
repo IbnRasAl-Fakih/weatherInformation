@@ -1,8 +1,9 @@
 Weather Forecast Project
+
 This repository contains a weather forecast project that provides information about the weather for the next 7 days, current day weather, and displays relevant background images. The project is hosted at https://weather-information-two.vercel.app/.
 
 
-Packages Used
+Packages Used:
 
 @googlemaps/google-maps-services-js@3.3.42
 
@@ -17,7 +18,7 @@ express@4.18.2
 mongoose@8.1.1
 
 
-APIs Used
+APIs Used:
 
 Weatherbit - Used for 7-day weather forecast. (https://www.weatherbit.io/)
 
